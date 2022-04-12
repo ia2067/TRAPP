@@ -1,4 +1,4 @@
-from app import  Config
+from app import Config
 from TrafficLight import TrafficLight
 import sys,os
 
@@ -10,8 +10,8 @@ class NullTL:
         pass
 
 
-class TrafficLightRegistery(object):
-    """ Central Registery for all our traffic Lights in the sumo simulation"""
+class TrafficLightRegistry(object):
+    """ Central Registry for all our traffic Lights in the sumo simulation"""
 
     # list of all tls
     tls = {}
@@ -24,18 +24,17 @@ class TrafficLightRegistery(object):
             junction_type = child.get('type')
             junction_id = child.get('id')
             if junction_type == "traffic_light":
-                name = "tl-" + junction_id
-                incLanes = child.attrib["incLanes"]
-                intLanes = child.attrib["intLanes"]
+                inc_lanes = child.attrib["incLanes"]
+                int_lanes = child.attrib["intLanes"]
                 shape = child.attrib["shape"]
                 x = child.attrib["x"]
                 y = child.attrib["y"]
-                cls.tls[name] = TrafficLight(name, junction_id, incLanes, intLanes, shape, x, y)
+                cls.tls[junction_id] = TrafficLight(junction_id, inc_lanes, int_lanes, shape, x, y)
 
     @classmethod
-    def findById(cls, tlID):
+    def findById(cls, tl_id):
         """ Returns a car by a given tlID"""
         try:
-            return TrafficLightRegistery.tls[tlID]
+            return cls.tls[tl_id]
         except:
             return NullTL()

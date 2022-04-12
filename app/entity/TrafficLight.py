@@ -7,9 +7,7 @@ from app import Config
 class TrafficLight:
     """ a class to represent an individual traffic light """
 
-    def __init__(self, name, id, incLanes, intLanes, shape, x, y):
-        # the string name
-        self.name = name
+    def __init__(self, id, incLanes, intLanes, shape, x, y):
         # the string id
         self.id = id
         self.incLanes = incLanes
@@ -43,3 +41,21 @@ class TrafficLight:
             return prog
         except:
             return None
+
+    def getAllProgramLogic(self):
+        """ wrapper method to get all the programs running on this TL"""
+        try:
+            progs = traci.trafficlight.getAllProgramLogics(self.id)
+            return progs
+        except Exception as ex:
+            print(ex)
+            return None
+
+    def setProgramLogic(self, logic):
+        """ wrapper method to get all the programs running on this TL"""
+        try:
+            traci.trafficlight.setProgramLogic(self.id, logic)
+        except Exception as ex:
+            print(ex)
+            return False
+        return True
