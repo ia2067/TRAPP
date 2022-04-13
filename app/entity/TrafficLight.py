@@ -1,5 +1,6 @@
 import traci
 import traci.constants as tc
+from LogicWrapper import LogicWrapper
 
 
 from app import Config
@@ -33,6 +34,7 @@ class TrafficLight:
             return None
 
     def getProgram(self):
+        """ DO NOT USE THIS ONE"""
         """ wrapper method to get the ID of the program currently running"""
         try:
             pID = traci.trafficlight.getProgram(self.id)
@@ -52,10 +54,18 @@ class TrafficLight:
             return None
 
     def setProgramLogic(self, logic):
-        """ wrapper method to get all the programs running on this TL"""
+        """ wrapper method to set the program running on the TL"""
         try:
-            traci.trafficlight.setProgramLogic(self.id, logic)
+            traci.trafficlight.setProgramLogic(self.id, logic.logic)
         except Exception as ex:
             print(ex)
             return False
         return True
+
+    def getProgramLogic(self):
+        """ get just the first 'program' of the TL"""
+        progs = self.getAllProgramLogic()
+        if progs is not None and len(progs) > 0:
+            return LogicWrapper(progs[0], self.getControlledLanes())
+        else:
+            return None
