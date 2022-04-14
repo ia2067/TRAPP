@@ -23,9 +23,12 @@ class LogicWrapper:
         else:
             return None
 
+    def _sublaneInLane(self, sublane, lane):
+        return sublane.startswith(lane)
+
     def getGreenPhasesOf(self, lane):
         # get indices of lane param
-        indices = [i for i, x in enumerate(self.lanes) if x == lane]
+        indices = [i for i, x in enumerate(self.lanes) if self._sublaneInLane(x, lane)]
         retval = set()
         for i, x in enumerate(self.logic.getPhases()):
             for l in indices:
