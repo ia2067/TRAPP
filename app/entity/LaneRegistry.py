@@ -1,5 +1,6 @@
 from app import Config
 from Lane import Lane
+from TrafficLightRegistry import TrafficLightRegistry
 
 import xml.etree.ElementTree as ET
 
@@ -11,8 +12,11 @@ class NullLane:
 class LaneRegistry(object):
     """ Central Registry for all the individual lanes in the sumo simulation"""
 
-    # list of all lanes
+    # dict of all lanes
     lanes = {}
+
+    # dict of lanes that go into traffic lights
+    incLanes = {}
 
     @classmethod
     def updateLanes(cls):
@@ -25,6 +29,16 @@ class LaneRegistry(object):
             lane_length = child.attrib["length"]
             lane_shape = child.attrib["shape"]
             cls.lanes[lane_id] = Lane(lane_id, lane_index, lane_speed, lane_length, lane_shape)
+        cls._updateTlIncLanes()
+
+    @classmethod
+    def _updateTlIncLanes(cls):
+        # update lanes entering traffic lights
+        for tl_id in TrafficLightRegistry.tls:
+            tl = TrafficLightRegistry.findById(tl_id)
+            lanes = tl.incLanes.split()
+            for lane in lanes:
+                cls.incLanes[lane] = cls.findById(lane)
 
     @classmethod
     def findById(cls, lane_id):

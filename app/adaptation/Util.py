@@ -4,6 +4,27 @@ from app.Util import get_output_folder_for_latest_EPOS_run
 class Util:
 
     @classmethod
+    def get_lane_wait_times(cls, start_index, index_count):
+        end_index = start_index + index_count
+        wait_times = []
+
+        with open("data/waits.csv", 'r') as results:
+            for i, line in enumerate(results):
+                line = line.split(",")
+                line[len(line)-1] = line[len(line)-1].replace('\r', '').replace('\n', '')
+                if i == 0:
+                    lanes = line
+                else:
+                    if i > start_index and i <= end_index:
+                        wait_times.append([float(u) for u in line[1:]])
+        waits_data = {}
+        for i in range(len(lanes)):
+            waits_data[lanes[i]] = [wait_time[i] for wait_time in wait_times]
+
+        return waits_data, lanes
+
+
+    @classmethod
     def get_trip_overheads(cls, start_index, index_count):
         end_index = start_index + index_count
         trip_overheads = []

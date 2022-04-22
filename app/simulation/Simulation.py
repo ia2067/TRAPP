@@ -7,6 +7,8 @@ from colorama import Fore
 
 from app import Config
 from app.entity.CarRegistry import CarRegistry
+from app.entity.TrafficLightRegistry import TrafficLightRegistry
+from app.entity.LaneRegistry import LaneRegistry
 from app.logging import info
 from app.routing.CustomRouter import CustomRouter
 import time
@@ -46,6 +48,10 @@ class Simulation(object):
     @classmethod
     def start(cls):
 
+        # update the registries
+        TrafficLightRegistry.updateTLs()
+        LaneRegistry.updateLanes()
+
         Knowledge.planning_period = Config.planning_period
         Knowledge.planning_step_horizon = Config.planning_step_horizon
         Knowledge.planning_steps = Config.planning_steps
@@ -53,10 +59,11 @@ class Simulation(object):
         Knowledge.beta = Config.beta
         Knowledge.globalCostFunction = Config.globalCostFunction
 
-        Util.remove_overhead_and_streets_files()
+        Util.remove_old_data()
         Util.add_data_folder_if_missing()
 
         CSVLogger.logEvent("streets", [edge.id for edge in Network.routingEdges])
+        CSVLogger.logEvent("waits", [lane_id for lane_id, lane in LaneRegistry.incLanes.items()])
 
         Util.prepare_epos_input_data_folders()
 
@@ -105,6 +112,7 @@ class Simulation(object):
                 CarRegistry.findById(removedCarId).setArrived(cls.tick)
 
             CSVLogger.logEvent("streets", [cls.tick] + [traci.edge.getLastStepVehicleNumber(edge.id)*CarRegistry.vehicle_length / edge.length for edge in Network.routingEdges])
+            CSVLogger.logEvent("waits", [cls.tick] + [lane.getWaitingTime() for lane_id, lane in LaneRegistry.incLanes.items()])
 
             if (cls.tick % 100) == 0:
                 info("Simulation -> Step:" + str(cls.tick) + " # Driving cars: " + str(

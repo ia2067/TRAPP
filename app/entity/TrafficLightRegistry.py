@@ -1,6 +1,5 @@
 from app import Config
 from TrafficLight import TrafficLight
-import sys,os
 
 import xml.etree.ElementTree as ET
 
@@ -13,7 +12,7 @@ class NullTL:
 class TrafficLightRegistry(object):
     """ Central Registry for all our traffic Lights in the sumo simulation"""
 
-    # list of all tls
+    # dict of all tls
     tls = {}
 
     @classmethod

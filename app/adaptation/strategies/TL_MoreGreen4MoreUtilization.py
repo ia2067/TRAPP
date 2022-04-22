@@ -11,47 +11,48 @@ from numpy import mean
 class TL_MoreGreen4MoreUtilization(Strategy):
 
     def monitor(self):
-        return Util.get_street_utilizations(Knowledge.time_of_last_adaptation, adaptation_period)[0]
+        return Util.get_lane_wait_times(Knowledge.time_of_last_adaptation, adaptation_period)[0]
 
-    def analyze(self, utilizations):
-        overloaded_streets = []
-        for street, utilizations in utilizations.iteritems():
-            mean_utilization = mean(utilizations)
+    def analyze(self, wait_times):
+        too_long_wait_lanes = []
+        too_short_wait_lanes = []
+        for lane, wait_time in wait_times.iteritems():
+            mean_wait_time = mean(wait_time)
             # increase green time
-            if mean_utilization > 0.2:
-                print "overloaded street: " + str(street)
-                overloaded_streets.append(street)
-            # if < 0.2 or 0.3
-            # lower utilization
-        return overloaded_streets
+            if mean_wait_time > 15:
+                print "Too Long of a wait: " + str(lane)
+                too_long_wait_lanes.append(lane)
+            if mean_wait_time < 3:
+                print "Too short of a wait: " + str(lane)
+                too_short_wait_lanes.append(lane)
+        return too_long_wait_lanes, too_short_wait_lanes
 
-    def plan(self, overloaded_streets):
-        TrafficLightRegistry.updateTLs()
-        changing_lights = []
+    def plan(self, affected_lanes):
+        increasing_lights = []
+        decreasing_lights = []
         for tl_id in TrafficLightRegistry.tls:
             tl = TrafficLightRegistry.findById(tl_id)
-            for lane in overloaded_streets:
+            for lane in affected_lanes[0]:
                 if lane in tl.incLanes:
-                    changing_lights.append((tl, lane))
+                    increasing_lights.append((tl, lane))
+            for lane in affected_lanes[1]:
+                if lane in tl.incLanes:
+                    decreasing_lights.append((tl, lane))
 
-
-
-        # avoid_streets_signal = []
-        # for i in range(Knowledge.planning_steps):
-        #     avoid_streets_signal += [0 if edge.id in overloaded_streets else 1 for edge in Network.routingEdges]
-        return changing_lights
+        return increasing_lights, decreasing_lights
 
     def execute(self, changing_lights):
-        for pair in changing_lights:
+        increasing_lights = changing_lights[0]
+        decreasing_lights = changing_lights[1]
+        for pair in increasing_lights:
             tl = pair[0]
             lane = pair[1]
             prog = tl.getProgramLogic()
             prog.changeGreenPhasesDuration(lane, 5)
             tl.setProgramLogic(prog)
-        # if len(avoid_streets_signal) > 0:
-        #     print "Sending signal to avoid overloaded streets!"
-        # with open('datasets/plans/signal.target', 'w') as signal_fil:
-        #     signal_writer = csv.writer(signal_fil, dialect='excel')
-        #     signal_writer.writerow(avoid_streets_signal)
-        #
-        # Knowledge.globalCostFunction = "XCORR"
+        for pair in decreasing_lights:
+            tl = pair[0]
+            lane = pair[1]
+            prog = tl.getProgramLogic()
+            prog.changeGreenPhasesDuration(lane, -2)
+            tl.setProgramLogic(prog)

@@ -9,3 +9,13 @@ class Lane:
         self.speed = speed
         self.length = length
         self.shape = shape
+
+
+    def getWaitingTime(self):
+        """ wrapper method to set the program running on the TL"""
+        try:
+            return traci.lane.getWaitingTime(self.id)
+        except Exception as ex:
+            print(ex)
+            return False
+        return True

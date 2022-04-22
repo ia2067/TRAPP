@@ -1,9 +1,6 @@
 import traci
-import traci.constants as tc
 from LogicWrapper import LogicWrapper
 
-
-from app import Config
 
 class TrafficLight:
     """ a class to represent an individual traffic light """

@@ -42,3 +42,5 @@ class LogicWrapper:
         phases = self.logic.getPhases()
         for i in gp:
             phases[i].duration += amount
+            if phases[i].duration < 3:
+                phases[i].duration = 3 # Cant go lower than 3 seconds of green time (unsure if this is appropriate)

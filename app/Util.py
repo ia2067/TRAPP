@@ -23,11 +23,13 @@ def add_data_folder_if_missing():
         os.makedirs("data")
 
 
-def remove_overhead_and_streets_files():
+def remove_old_data():
     if os.path.exists("data/overheads.csv"):
         os.remove("data/overheads.csv")
     if os.path.exists("data/streets.csv"):
         os.remove("data/streets.csv")
+    if os.path.exists("data/waits.csv"):
+        os.remove("data/waits.csv")
 
 def prepare_epos_input_data_folders():
     if not os.path.exists("datasets"):
