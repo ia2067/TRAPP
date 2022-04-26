@@ -41,6 +41,7 @@ class LogicWrapper:
         gp = self.getGreenPhasesOf(lane)
         phases = self.logic.getPhases()
         for i in gp:
-            phases[i].duration += amount
+            phases[i].duration *= amount
+            phases[i].duration = round(phases[i].duration)
             if phases[i].duration < 3:
                 phases[i].duration = 3 # Cant go lower than 3 seconds of green time (unsure if this is appropriate)

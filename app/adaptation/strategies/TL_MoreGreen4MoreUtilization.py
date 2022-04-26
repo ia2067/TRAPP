@@ -44,15 +44,24 @@ class TL_MoreGreen4MoreUtilization(Strategy):
     def execute(self, changing_lights):
         increasing_lights = changing_lights[0]
         decreasing_lights = changing_lights[1]
+        currTime = 0
         for pair in increasing_lights:
             tl = pair[0]
             lane = pair[1]
             prog = tl.getProgramLogic()
-            prog.changeGreenPhasesDuration(lane, 5)
+            #currTime = prog.getGreenPhasesOf(lane)
+            #currTime = currTime*1.1
+            #currTime = round(currTime)
+            #prog.changeGreenPhasesDuration(lane, 5)
+            prog.changeGreenPhasesDuration(lane, 1.4)
             tl.setProgramLogic(prog)
         for pair in decreasing_lights:
             tl = pair[0]
             lane = pair[1]
             prog = tl.getProgramLogic()
-            prog.changeGreenPhasesDuration(lane, -2)
+            #currTime = prog.getGreenPhasesOf(lane)
+            #currTime = currTime*0.9
+            #currTime = round(currTime)
+            #prog.changeGreenPhasesDuration(lane, -2)
+            prog.changeGreenPhasesDuration(lane, 0.9)
             tl.setProgramLogic(prog)
